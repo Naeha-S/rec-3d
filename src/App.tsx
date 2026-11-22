@@ -146,6 +146,29 @@ export function App() {
     return findRoute(pathGraph, routeFromId, routeToId);
   }, [pathGraph, routeFromId, routeToId]);
 
+  // Automatically frame the full walking path whenever a valid route is created
+  useEffect(() => {
+    if (!activeRoute || !activeRoute.ok || activeRoute.points.length < 2) return;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minZ = Infinity;
+    let maxZ = -Infinity;
+    for (const [x, z] of activeRoute.points) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (z < minZ) minZ = z;
+      if (z > maxZ) maxZ = z;
+    }
+    const midX = (minX + maxX) * 0.5;
+    const midZ = (minZ + maxZ) * 0.5;
+    const span = Math.hypot(maxX - minX, maxZ - minZ);
+    setFlyRequest({
+      target: [midX, 0, midZ],
+      distance: Math.min(480, Math.max(55, span * 1.45)),
+      seq: Date.now(),
+    });
+  }, [activeRoute]);
+
   const tourStops = useMemo(
     () => (campus ? getTourStops(campus.buildings) : []),
     [campus]
