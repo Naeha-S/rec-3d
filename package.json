@@ -1,0 +1,37 @@
+{
+  "name": "rec-3d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static low-poly 3D campus orientation map for Rajalakshmi Engineering College, Thandalam, Chennai",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "build:pages": "GITHUB_PAGES=true npm run build",
+    "preview": "vite preview --host 0.0.0.0",
+    "budget": "node scripts/check-budget.mjs",
+    "data:osm": "python3 scripts/fetch_osm.py",
+    "data:elev": "python3 scripts/fetch_elevation.py",
+    "data:project": "python3 scripts/project.py"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.121.4",
+    "@react-three/fiber": "^8.17.12",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.170.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.6",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/three": "^0.170.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.6",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}
