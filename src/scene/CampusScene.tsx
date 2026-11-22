@@ -299,6 +299,8 @@ function CameraAndLabelSync({
     <OrbitControls
       ref={controlsRef}
       makeDefault
+      enablePan
+      screenSpacePanning={false}
       enableDamping={!reducedMotion}
       dampingFactor={0.075}
       minDistance={24}

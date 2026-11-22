@@ -1,4 +1,4 @@
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Sunrise, Sun, Sunset, Moon } from 'lucide-react';
 import { formatHourLabel } from '../logic/solar';
 
 interface TimeControlsProps {
@@ -9,10 +9,10 @@ interface TimeControlsProps {
 }
 
 const PRESETS = [
-  { label: '06h', title: 'Dawn', hour: 6.35 },
-  { label: '12h', title: 'Noon', hour: 12.5 },
-  { label: '17h', title: 'Dusk', hour: 17.4 },
-  { label: '21h', title: 'Night', hour: 21.0 },
+  { id: 'dawn', title: 'Dawn (06:20)', hour: 6.35, Icon: Sunrise },
+  { id: 'noon', title: 'Noon (12:30)', hour: 12.5, Icon: Sun },
+  { id: 'dusk', title: 'Dusk (17:25)', hour: 17.4, Icon: Sunset },
+  { id: 'night', title: 'Night (21:00)', hour: 21.0, Icon: Moon },
 ] as const;
 
 export function TimeControls({
@@ -48,22 +48,22 @@ export function TimeControls({
       />
 
       <div className="flex items-center gap-0.5 shrink-0 border-l border-zinc-900/10 pl-2">
-        {PRESETS.map(({ label, title, hour: presetHour }) => {
+        {PRESETS.map(({ id, title, hour: presetHour, Icon }) => {
           const active = Math.abs(hour - presetHour) < 0.35;
           return (
             <button
-              key={label}
+              key={id}
               type="button"
               title={title}
               onClick={() => onChangeHour(presetHour)}
               aria-label={`Set campus sun to ${title} (${formatHourLabel(presetHour)})`}
-              className={`rounded-[3px] px-1.5 py-0.5 text-[11px] tabular-nums font-medium transition-colors ${
+              className={`rounded-[3px] p-1 transition-colors ${
                 active
                   ? 'bg-zinc-900 text-white'
                   : 'text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900'
               }`}
             >
-              {label}
+              <Icon className="h-3.5 w-3.5" />
             </button>
           );
         })}

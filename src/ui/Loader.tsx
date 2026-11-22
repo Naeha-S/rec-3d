@@ -7,7 +7,7 @@ interface LoaderProps {
   onRetry: () => void;
 }
 
-export function Loader({ error, onRetry }: LoaderProps) {
+export function Loader({ progress, stage, error, onRetry }: LoaderProps) {
   return (
     <div
       role="status"
@@ -45,8 +45,25 @@ export function Loader({ error, onRetry }: LoaderProps) {
       ) : (
         <div
           aria-label="Loading map"
-          className="h-4 w-4 rounded-full border-[1.5px] border-zinc-300 border-t-zinc-800 animate-spin"
-        />
+          className="flex w-full max-w-xs flex-col items-center gap-4 rounded-xl bg-white/95 p-6 border border-zinc-900/10 shadow-sm"
+        >
+          <img
+            src="./rec-logo.png"
+            alt="Rajalakshmi Engineering College"
+            className="h-14 w-auto object-contain"
+          />
+          <div className="w-full space-y-1.5">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+              <div
+                className="h-full rounded-full bg-[#4A154B] transition-all duration-300"
+                style={{ width: `${Math.max(8, Math.min(100, Math.round(progress * 100)))}%` }}
+              />
+            </div>
+            <p className="text-center text-[11px] font-medium text-zinc-600">
+              {stage || 'Loading 3D campus…'}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
