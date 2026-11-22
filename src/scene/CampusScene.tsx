@@ -437,6 +437,7 @@ export function CampusScene({
           className="pointer-events-none absolute inset-0 overflow-hidden z-10"
         >
           {campus.buildings.map((b) => {
+            if (b.id === 'white-stairs') return null;
             const isSelected = selectedId === b.id;
             const isDimmed = activeCategory !== 'all' && b.cat !== activeCategory;
             if (isDimmed && !isSelected) return null;
