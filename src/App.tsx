@@ -581,8 +581,12 @@ export function App() {
 
           {/* Mandatory ODbL OpenStreetMap Attribution Footer */}
           <footer className="pointer-events-auto flex items-center justify-between text-[10px] text-zinc-700">
-            <span className="rounded-[3px] bg-[#fafaf9]/85 border border-zinc-900/10 px-2 py-0.5">
-              REC Thandalam
+            <span className="inline-flex items-center rounded-[3px] bg-[#fafaf9]/90 border border-zinc-900/10 px-1.5 py-0.5">
+              <img
+                src="./rec-logo.png"
+                alt="Rajalakshmi Engineering College"
+                className="h-5 w-auto object-contain"
+              />
             </span>
             <button
               type="button"

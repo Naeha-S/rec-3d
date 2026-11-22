@@ -259,6 +259,17 @@ export function Search({
                 ))}
               </select>
             </label>
+
+            <button
+              type="button"
+              disabled={!routeToId}
+              onClick={() => {
+                if (routeToId) onChangeRouteTo(routeToId);
+              }}
+              className="mt-1 w-full rounded-[4px] bg-zinc-900 px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Create Path
+            </button>
           </div>
 
           {route && (

@@ -219,22 +219,52 @@ export function Ground({ elevation, areas, paths, receiveShadow }: GroundProps) 
 
       if (a.kind === 'pitch') {
         const isElevatedBball = a.id === 'basketball-court';
-        const lineLift = isElevatedBball ? 0.50 : 0.14;
+        // For the elevated BB court, its deck is a flat BoxGeometry at by + 0.48;
+        // use a flat constant Y (by + 0.495) so lines never dip below the deck.
+        const bballBaseY = isElevatedBball ? sampleElevation(elevation, cx, cz) : 0;
+        const pushCourtQuad = (
+          ax: number,
+          az: number,
+          bx: number,
+          bz: number,
+          width: number
+        ) => {
+          if (!isElevatedBball) {
+            pushGroundQuad(markPos, elevation, ax, az, bx, bz, width, 0.14);
+            return;
+          }
+          const dx = bx - ax;
+          const dz = bz - az;
+          const len = Math.hypot(dx, dz);
+          if (len < 0.05) return;
+          const nx = (-dz / len) * (width * 0.5);
+          const nz = (dx / len) * (width * 0.5);
+          const y = bballBaseY + 0.805;
+          markPos.push(
+            ax + nx, y, az + nz,
+            bx + nx, y, bz + nz,
+            ax - nx, y, az - nz,
+            ax - nx, y, az - nz,
+            bx + nx, y, bz + nz,
+            bx - nx, y, bz - nz
+          );
+        };
+
         const inset = 1.0;
         const x0 = bb.minX + inset;
         const x1 = bb.maxX - inset;
         const z0 = bb.minZ + inset;
         const z1 = bb.maxZ - inset;
         const lw = 0.15;
-        pushGroundQuad(markPos, elevation, x0, z0, x1, z0, lw, lineLift);
-        pushGroundQuad(markPos, elevation, x1, z0, x1, z1, lw, lineLift);
-        pushGroundQuad(markPos, elevation, x1, z1, x0, z1, lw, lineLift);
-        pushGroundQuad(markPos, elevation, x0, z1, x0, z0, lw, lineLift);
+        pushCourtQuad(x0, z0, x1, z0, lw);
+        pushCourtQuad(x1, z0, x1, z1, lw);
+        pushCourtQuad(x1, z1, x0, z1, lw);
+        pushCourtQuad(x0, z1, x0, z0, lw);
 
         if (w >= d) {
-          pushGroundQuad(markPos, elevation, cx, z0, cx, z1, lw, lineLift);
+          pushCourtQuad(cx, z0, cx, z1, lw);
         } else {
-          pushGroundQuad(markPos, elevation, x0, cz, x1, cz, lw, lineLift);
+          pushCourtQuad(x0, cz, x1, cz, lw);
         }
 
         const radius = Math.min(w, d) * 0.18;
@@ -243,31 +273,50 @@ export function Ground({ elevation, areas, paths, receiveShadow }: GroundProps) 
           for (let s = 0; s < segs; s++) {
             const a0 = (s / segs) * Math.PI * 2;
             const a1 = ((s + 1) / segs) * Math.PI * 2;
-            pushGroundQuad(
-              markPos,
-              elevation,
+            pushCourtQuad(
               cx + Math.cos(a0) * radius,
               cz + Math.sin(a0) * radius,
               cx + Math.cos(a1) * radius,
               cz + Math.sin(a1) * radius,
-              lw * 0.85,
-              lineLift
+              lw * 0.85
             );
           }
         }
 
-        // Extra basketball key boxes on the elevated Basketball Court
+        // Extra basketball key boxes + 3-point arcs on the elevated Basketball Court
         if (isElevatedBball) {
           const keyHalfW = 2.4;
           const keyLen = 5.4;
           // North key
-          pushGroundQuad(markPos, elevation, cx - keyHalfW, z0, cx - keyHalfW, z0 + keyLen, 0.12, lineLift);
-          pushGroundQuad(markPos, elevation, cx + keyHalfW, z0, cx + keyHalfW, z0 + keyLen, 0.12, lineLift);
-          pushGroundQuad(markPos, elevation, cx - keyHalfW, z0 + keyLen, cx + keyHalfW, z0 + keyLen, 0.12, lineLift);
+          pushCourtQuad(cx - keyHalfW, z0, cx - keyHalfW, z0 + keyLen, 0.12);
+          pushCourtQuad(cx + keyHalfW, z0, cx + keyHalfW, z0 + keyLen, 0.12);
+          pushCourtQuad(cx - keyHalfW, z0 + keyLen, cx + keyHalfW, z0 + keyLen, 0.12);
           // South key
-          pushGroundQuad(markPos, elevation, cx - keyHalfW, z1, cx - keyHalfW, z1 - keyLen, 0.12, lineLift);
-          pushGroundQuad(markPos, elevation, cx + keyHalfW, z1, cx + keyHalfW, z1 - keyLen, 0.12, lineLift);
-          pushGroundQuad(markPos, elevation, cx - keyHalfW, z1 - keyLen, cx + keyHalfW, z1 - keyLen, 0.12, lineLift);
+          pushCourtQuad(cx - keyHalfW, z1, cx - keyHalfW, z1 - keyLen, 0.12);
+          pushCourtQuad(cx + keyHalfW, z1, cx + keyHalfW, z1 - keyLen, 0.12);
+          pushCourtQuad(cx - keyHalfW, z1 - keyLen, cx + keyHalfW, z1 - keyLen, 0.12);
+
+          // 3-point arcs at North & South baselines
+          const arcR = Math.min(6.75, (x1 - x0) * 0.42);
+          const arcSegs = 14;
+          for (let s = 0; s < arcSegs; s++) {
+            const t0 = (s / arcSegs) * Math.PI;
+            const t1 = ((s + 1) / arcSegs) * Math.PI;
+            pushCourtQuad(
+              cx + Math.cos(t0) * arcR,
+              z0 + 1.2 + Math.sin(t0) * arcR,
+              cx + Math.cos(t1) * arcR,
+              z0 + 1.2 + Math.sin(t1) * arcR,
+              0.11
+            );
+            pushCourtQuad(
+              cx + Math.cos(t0) * arcR,
+              z1 - 1.2 - Math.sin(t0) * arcR,
+              cx + Math.cos(t1) * arcR,
+              z1 - 1.2 - Math.sin(t1) * arcR,
+              0.11
+            );
+          }
         }
       } else if (a.kind === 'parking') {
         const stripeSpacing = 3.2;
@@ -421,14 +470,14 @@ export function Ground({ elevation, areas, paths, receiveShadow }: GroundProps) 
       const bcz = (bb.minZ + bb.maxZ) * 0.5;
       const by = sampleElevation(elevation, bcx, bcz);
 
-      // Stepped concrete apron (+0.34 m) + crisp elevated court surface (+0.45 m)
-      const apron = new THREE.BoxGeometry(bw + 1.4, 0.52, bd + 1.4);
-      apron.translate(bcx, by + 0.12, bcz);
+      // Stepped concrete apron (+0.60 m) + crisp elevated court surface (+0.78 m)
+      const apron = new THREE.BoxGeometry(bw + 1.4, 0.72, bd + 1.4);
+      apron.translate(bcx, by + 0.24, bcz);
       pushColoredPart(csVerts, csNorms, csCols, apron, '#b5b8bc');
       apron.dispose();
 
-      const deck = new THREE.BoxGeometry(bw, 0.14, bd);
-      deck.translate(bcx, by + 0.41, bcz);
+      const deck = new THREE.BoxGeometry(bw, 0.18, bd);
+      deck.translate(bcx, by + 0.69, bcz);
       pushColoredPart(csVerts, csNorms, csCols, deck, '#3e7b52');
       deck.dispose();
 
@@ -436,22 +485,22 @@ export function Ground({ elevation, areas, paths, receiveShadow }: GroundProps) 
       for (const sgn of [-1, 1]) {
         const hz = bcz + sgn * (bd * 0.5 - 0.8);
         const post = new THREE.BoxGeometry(0.22, 3.3, 0.22);
-        post.translate(bcx, by + 2.05, hz);
+        post.translate(bcx, by + 2.35, hz);
         pushColoredPart(csVerts, csNorms, csCols, post, '#334155');
         post.dispose();
 
         const arm = new THREE.BoxGeometry(0.18, 0.18, 1.0);
-        arm.translate(bcx, by + 3.55, hz - sgn * 0.45);
+        arm.translate(bcx, by + 3.85, hz - sgn * 0.45);
         pushColoredPart(csVerts, csNorms, csCols, arm, '#334155');
         arm.dispose();
 
         const board = new THREE.BoxGeometry(1.85, 1.15, 0.1);
-        board.translate(bcx, by + 3.65, hz - sgn * 0.95);
+        board.translate(bcx, by + 3.95, hz - sgn * 0.95);
         pushColoredPart(csVerts, csNorms, csCols, board, '#f8fafc');
         board.dispose();
 
         const rim = new THREE.BoxGeometry(0.55, 0.08, 0.55);
-        rim.translate(bcx, by + 3.28, hz - sgn * 1.25);
+        rim.translate(bcx, by + 3.58, hz - sgn * 1.25);
         pushColoredPart(csVerts, csNorms, csCols, rim, '#ea580c');
         rim.dispose();
       }

@@ -363,7 +363,7 @@ function buildSpecialStructure(
       // Ensure steps descend eastward (+X) toward the central field
       const eastSign = obb.vx >= 0 ? 1 : -1;
       const lv = (-1 + s) * stepW * eastSign;
-      addLocalBox(spanU * 0.94, stepH, stepW + 0.15, 0, stepH * 0.5, lv, stepColors[s]);
+      addLocalBox(spanU * 0.94, stepH + 0.8, stepW + 0.15, 0, stepH * 0.5 - 0.4, lv, stepColors[s]);
     }
   } else if (b.style === 'monument') {
     // Aadhi Statue (image-5.png): REC's heroic Blackbuck mascot in purple tracksuit,
@@ -590,6 +590,152 @@ function buildSpecialStructure(
     addLocalBox(kSize * 0.4, 0.28, 0.12, kSize * 0.22, 0.52, fz, '#f1f5f9');
     // Chrome foot-rail along bottom front
     addLocalBox(kSize * 0.88, 0.09, 0.16, 0, 0.38, fz + 0.12, '#e2e8f0');
+  } else if (b.style === 'idea_factory') {
+    // Idea Factory (image-2.png):
+    // Tall modern building with crisp white/silver perimeter cladding frame,
+    // full-height floor-to-ceiling glass curtain wall across the front facade,
+    // vertical white/metallic mullions/fins, and ground-level entrance portal.
+    const w = spanU;
+    const d = spanV;
+    const h = b.height_m || 15.0;
+
+    // Ground plaza / stepped granite plinth
+    addLocalBox(w + 1.4, 0.36, d + 1.4, 0, 0.18, 0, '#94a3b8');
+    // Main structural core (slightly recessed behind glass curtain wall)
+    addLocalBox(w - 0.6, h - 0.4, d - 0.8, 0, 0.36 + (h - 0.4) * 0.5, 0, '#e2e8f0');
+
+    // Full-height dark blue-teal glass curtain wall on front (+V) and back (-V)
+    for (const sgn of [-1, 1]) {
+      const gz = sgn * (d * 0.5 - 0.12);
+      addLocalBox(w - 1.4, h - 1.4, 0.18, 0, 0.36 + (h - 1.0) * 0.5, gz, '#1e3a5f');
+
+      // Vertical architectural mullions / perforated screen fins
+      const numFins = Math.max(6, Math.floor(w / 2.2));
+      for (let i = 0; i <= numFins; i++) {
+        const fu = -w * 0.5 + 0.8 + (i / numFins) * (w - 1.6);
+        addLocalBox(0.18, h - 1.2, 0.34, fu, 0.36 + (h - 1.0) * 0.5, gz + sgn * 0.08, '#f1f5f9');
+      }
+
+      // Subtle horizontal floor spandrel bands behind/across the glass
+      const floors = Math.max(3, Math.round(h / 3.6));
+      for (let f = 1; f < floors; f++) {
+        const fy = 0.36 + (f / floors) * (h - 1.2);
+        addLocalBox(w - 1.3, 0.22, 0.24, 0, fy, gz + sgn * 0.02, '#cbd5e1');
+      }
+    }
+
+    // Crisp white/silver outer cladding frame (left/right pillars + top parapet beam)
+    addLocalBox(1.1, h, d + 0.15, -w * 0.5 + 0.55, 0.36 + h * 0.5, 0, '#f8fafc');
+    addLocalBox(1.1, h, d + 0.15, w * 0.5 - 0.55, 0.36 + h * 0.5, 0, '#f8fafc');
+    addLocalBox(w + 0.2, 1.15, d + 0.25, 0, 0.36 + h - 0.4, 0, '#f8fafc');
+
+    // Ground-level recessed entrance portal on front (+V)
+    addLocalBox(4.2, 3.4, 0.9, 0, 0.36 + 1.7, d * 0.5 + 0.15, '#cbd5e1');
+    addLocalBox(3.4, 2.9, 0.3, 0, 0.36 + 1.45, d * 0.5 + 0.48, '#0f172a');
+  } else if (b.style === 'dominos') {
+    // Domino's Pizza (image-1.png):
+    // Dark navy-blue exterior, pitched/slanted roof with bright red fascia trim,
+    // Domino's red-and-blue square logo + white signage, serving window & outdoor patio railing.
+    const w = spanU;
+    const d = spanV;
+    const h = b.height_m || 4.6;
+
+    // Concrete patio plinth
+    addLocalBox(w + 1.6, 0.24, d + 2.4, 0, 0.12, 0.5, '#cbd5e1');
+    // Dark navy-blue main building body
+    addLocalBox(w, h, d, 0, 0.24 + h * 0.5, 0, '#172554');
+    // Slanted/stepped roof cap with bright red fascia trim
+    addLocalBox(w + 0.5, 0.32, d + 0.7, 0, 0.24 + h + 0.16, 0.1, '#dc2626');
+    addLocalBox(w + 0.3, 0.25, d + 0.5, 0, 0.24 + h + 0.38, 0.05, '#1e293b');
+
+    // Front (+V) Domino's signage: red/blue tilted logo + white "Domino's" bar
+    const fz = d * 0.5 + 0.08;
+    addLocalBox(0.75, 0.75, 0.12, -w * 0.18, 0.24 + h - 0.9, fz, '#dc2626');
+    addLocalBox(0.75, 0.75, 0.12, -w * 0.18 - 0.45, 0.24 + h - 1.25, fz, '#2563eb');
+    addLocalBox(w * 0.42, 0.65, 0.12, w * 0.14, 0.24 + h - 1.05, fz, '#f8fafc');
+
+    // Serving window + illuminated menu board
+    addLocalBox(w * 0.36, 1.5, 0.12, -w * 0.15, 0.24 + 1.6, fz, '#0f172a');
+    addLocalBox(w * 0.32, 0.55, 0.14, -w * 0.15, 0.24 + 2.1, fz + 0.02, '#fef08a');
+
+    // Outdoor seating black metal railing along front patio
+    const rz = d * 0.5 + 1.45;
+    addLocalBox(w + 1.2, 0.08, 0.08, 0, 0.24 + 0.95, rz, '#18181b');
+    for (let i = -3; i <= 3; i++) {
+      addLocalBox(0.08, 0.95, 0.08, (i / 3) * (w * 0.5), 0.24 + 0.48, rz, '#18181b');
+    }
+  } else if (b.style === 'rec_cafe') {
+    // REC Cafe (image-3.png):
+    // Boxy modern building with horizontal striped/louvered grey & white cladding,
+    // dark recessed window/entrance openings, "REC Cafe" corner sign, and base hedges.
+    const w = spanU;
+    const d = spanV;
+    const h = b.height_m || 8.5;
+
+    // Base plinth + steps
+    addLocalBox(w + 1.0, 0.32, d + 1.0, 0, 0.16, 0, '#cbd5e1');
+    // Main concrete core
+    addLocalBox(w, h, d, 0, 0.32 + h * 0.5, 0, '#a1a1aa');
+
+    // Horizontal striped/louvered cladding bands all around
+    const bands = Math.max(8, Math.floor(h / 0.55));
+    for (let i = 0; i < bands; i++) {
+      const by = 0.32 + (i + 0.5) * (h / bands);
+      const col = i % 2 === 0 ? '#e4e4e7' : '#71717a';
+      addLocalBox(w + 0.16, 0.26, d + 0.16, 0, by, 0, col);
+    }
+
+    // Dark recessed openings on opposite sides (-V & +U)
+    addLocalBox(w * 0.48, 2.2, 0.24, -w * 0.12, 0.32 + h * 0.58, -d * 0.5 - 0.04, '#18181b');
+    addLocalBox(w * 0.36, 2.4, 0.24, -w * 0.2, 0.32 + 1.2, -d * 0.5 - 0.04, '#18181b');
+    addLocalBox(0.24, 2.2, d * 0.45, w * 0.5 + 0.04, 0.32 + h * 0.58, 0, '#18181b');
+
+    // "REC Cafe" white sign plaque on the opposite corner
+    addLocalBox(2.2, 1.1, 0.14, w * 0.32, 0.32 + 3.2, -d * 0.5 - 0.14, '#f8fafc');
+    // Green hedges along the opposite base
+    addLocalBox(w * 0.6, 0.75, 0.85, w * 0.15, 0.32 + 0.38, -d * 0.5 - 0.55, '#4d7c0f');
+  } else if (b.style === 'b_block') {
+    // B Block (image-4.png, image-5.png):
+    // Iconic terracotta-red & white 5-floor academic block with protruding 4-column portico
+    // and triangular pediment facing North (-Z, toward Aadhi Statue roundabout).
+    const w = spanU;
+    const d = spanV;
+    const h = b.height_m || 18.0;
+
+    // White ground floor & top floor, terracotta-red middle bands
+    addLocalBox(w, h * 0.28, d * 0.45, 0, h * 0.14, 0, '#f8fafc');
+    addLocalBox(w, h * 0.44, d * 0.45, 0, h * 0.50, 0, '#b84a39');
+    addLocalBox(w, h * 0.28, d * 0.45, 0, h * 0.86, 0, '#f8fafc');
+
+    // Side wings extending South (+V)
+    addLocalBox(w * 0.18, h, d * 0.55, -w * 0.41, h * 0.5, d * 0.25, '#f8fafc');
+    addLocalBox(w * 0.18, h, d * 0.55, w * 0.41, h * 0.5, d * 0.25, '#f8fafc');
+
+    // Dark horizontal window bands on front (-V)
+    for (let f = 0; f < 4; f++) {
+      const fy = 2.4 + f * 3.8;
+      addLocalBox(w * 0.88, 1.35, 0.16, 0, fy, -d * 0.225 - 0.04, '#1e293b');
+    }
+
+    // Protruding front portico (-V, facing Aadhi Statue):
+    // Raised white plinth, 4 tall terracotta-red columns, flat canopy + triangular pediment fascia
+    const pz = -d * 0.225 - 5.5;
+    addLocalBox(15.5, 0.35, 11.0, 0, 0.175, pz, '#e2e8f0');
+    for (const cx of [-6.4, -2.4, 2.4, 6.4]) {
+      addLocalBox(0.85, 7.2, 0.85, cx, 3.6, pz - 4.2, '#c0503e');
+    }
+    // Portico roof slab & terracotta-red fascia + stepped pediment
+    addLocalBox(15.2, 1.8, 10.8, 0, 7.8, pz, '#c0503e');
+    addLocalBox(10.0, 1.1, 0.6, 0, 9.1, pz - 5.1, '#c0503e');
+    addLocalBox(5.2, 0.9, 0.6, 0, 9.9, pz - 5.1, '#c0503e');
+  } else if (b.style === 'skybridge') {
+    // 2nd-floor covered skybridge connecting D Block & C Block (y = 4.2m to 7.4m)
+    const w = spanU;
+    const d = spanV;
+    addLocalBox(w, 0.35, d, 0, 4.35, 0, '#cbd5e1');
+    addLocalBox(w, 2.5, 0.2, 0, 5.75, -d * 0.5 + 0.1, '#1e3a5f');
+    addLocalBox(w, 2.5, 0.2, 0, 5.75, d * 0.5 - 0.1, '#1e3a5f');
+    addLocalBox(w, 0.35, d + 0.4, 0, 7.15, 0, '#f8fafc');
   } else if (b.style === 'sixth_sense_garden' || b.style === 'open_cafe') {
     // 6th Sense Garden / Garden Cafe (image-6.png):
     // Botanical garden with grey pebble walkway leading to a cream stone plinth + seated purple

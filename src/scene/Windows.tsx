@@ -22,6 +22,11 @@ const NON_WINDOW_STYLES = new Set([
   'open_cafe',
   'sixth_sense_garden',
   'maggi_kiosk',
+  'idea_factory',
+  'dominos',
+  'rec_cafe',
+  'b_block',
+  'skybridge',
 ]);
 
 interface MergedBuildingWindows {
