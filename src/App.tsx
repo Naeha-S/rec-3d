@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type {
   Building,
@@ -146,9 +147,23 @@ export function App() {
     return findRoute(pathGraph, routeFromId, routeToId);
   }, [pathGraph, routeFromId, routeToId]);
 
+  // Track initial page visit for /api/stats
+  useEffect(() => {
+    fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'visit' }),
+    }).catch(() => {});
+  }, []);
+
   // Automatically frame the full walking path whenever a valid route is created
   useEffect(() => {
     if (!activeRoute || !activeRoute.ok || activeRoute.points.length < 2) return;
+    fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'interaction', event: 'route_created' }),
+    }).catch(() => {});
     let minX = Infinity;
     let maxX = -Infinity;
     let minZ = Infinity;
@@ -611,16 +626,27 @@ export function App() {
                 className="h-5 w-auto object-contain"
               />
             </span>
-            <button
-              type="button"
-              onClick={() => setAboutOpen(true)}
-              className="rounded-[3px] bg-[#fafaf9]/85 border border-zinc-900/10 px-2 py-0.5 text-zinc-700 hover:text-zinc-950 hover:underline"
-            >
-              © OpenStreetMap contributors, ODbL
-            </button>
+            <div className="flex items-center gap-1.5">
+              <a
+                href="https://www.linkedin.com/in/naeha-s/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-[3px] bg-[#fafaf9]/85 border border-zinc-900/10 px-2 py-0.5 text-zinc-700 hover:text-zinc-950 hover:underline"
+              >
+                Dev: Naeha S
+              </a>
+              <button
+                type="button"
+                onClick={() => setAboutOpen(true)}
+                className="rounded-[3px] bg-[#fafaf9]/85 border border-zinc-900/10 px-2 py-0.5 text-zinc-700 hover:text-zinc-950 hover:underline"
+              >
+                © OpenStreetMap contributors, ODbL
+              </button>
+            </div>
           </footer>
         </div>
       </div>
+      <Analytics />
 
       <About
         open={aboutOpen}
